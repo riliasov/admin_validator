@@ -21,7 +21,7 @@
 
 ```bash
 git clone <repo-url>
-cd sales_quality_checker
+cd admin_validator
 ```
 
 ### 2. Установка зависимостей

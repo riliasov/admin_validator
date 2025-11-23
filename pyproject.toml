@@ -1,5 +1,5 @@
 [project]
-name = "planeta"
+name = "admin_validator"
 version = "0.1.0"
 description = "A tool to validate sales data in Google Sheets"
 requires-python = ">=3.10"

@@ -42,7 +42,7 @@
 ## Project Structure
 
 ```
-sales_quality_checker/
+admin_validator/
 ├── src/
 │   ├── config.py          # Pydantic configuration
 │   ├── runner.py          # Main entry point
