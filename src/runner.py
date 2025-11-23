@@ -3,7 +3,7 @@ import time
 import sys
 from src.config import load_config
 from src.sheets_client import SheetsClient
-from src.validator import SalesValidator, TrainingsValidator, LeadsValidator
+from src.validators import SalesValidator, TrainingsValidator, LeadsValidator
 from src.report_manager import ReportManager
 
 # Настройка логирования
