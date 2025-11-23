@@ -46,11 +46,7 @@ class TrainingsValidator(BaseValidator):
             # Для пропусков/отмен - ищем админа, работавшего в этот день
             admin = self._find_admin_on_duty(date_val)
         else:
-            # Для остальных - пока оставляем старую логику или тоже используем поиск по дате?
-            # В старой логике было _find_admin_for_training(client, status, date_val)
-            # Но она выглядела странно (искала строку с тем же клиентом и статусом, но типом Администратор).
-            # Скорее всего, для обычных тренировок админ тоже тот, кто работал в этот день.
-            # Но пока меняем ТОЛЬКО для cancellation_statuses по запросу пользователя.
+            # Для остальных - используем поиск по дате (как наиболее надежный метод)
             admin = self._find_admin_on_duty(date_val)
         
         # 0. Проверка даты и фильтрация будущего
@@ -286,7 +282,7 @@ class TrainingsValidator(BaseValidator):
                         client_for_admin = self._get_val(row, "Клиент")
                         status_for_admin = self._get_val(row, "Статус")
                         date_for_admin = self._get_val(row, "Дата")
-                        admin = self._find_admin_for_training(client_for_admin, status_for_admin, date_for_admin)
+                        admin = self._find_admin_on_duty(date_for_admin)
                         
                         errors.append(ValidationError(
                             row_number=sheet_row_num,

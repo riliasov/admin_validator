@@ -57,27 +57,7 @@ class SheetsClient:
         else:
             raise FileNotFoundError(f"Файл сервисного аккаунта '{self.SERVICE_ACCOUNT_FILE}' не найден.")
 
-    def read_data(self, sheet_name: str, range_name: str = None) -> list:
-        """
-        Читает данные из указанного листа.
-        
-        Args:
-            sheet_name: Название листа
-            range_name: Опциональный диапазон (например, "A1:T"). Если не указан, читает весь лист.
-            
-        Returns:
-            list: Список строк (списков значений)
-        """
-        try:
-            target = f"{sheet_name}!{range_name}" if range_name else sheet_name
-            result = self.service.spreadsheets().values().get(
-                spreadsheetId=self.spreadsheet_id,
-                range=target
-            ).execute()
-            return result.get('values', [])
-        except Exception as e:
-            # Логирование ошибки можно добавить здесь или выше
-            raise e
+
 
     def get_sheet_values(self, sheet_name: str) -> list[list[str]]:
         """

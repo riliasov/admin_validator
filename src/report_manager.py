@@ -2,7 +2,7 @@ import hashlib
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 from dataclasses import dataclass
-from .validator import ValidationError
+from src.models import ValidationError
 
 
 @dataclass

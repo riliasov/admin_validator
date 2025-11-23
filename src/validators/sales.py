@@ -14,14 +14,7 @@ class SalesValidator(BaseValidator):
         Использует UNFORMATTED_VALUE (типы сохраняются).
         """
         errors = []
-        # row_idx приходит из enumerate(data[1:], start=1).
-        # Если мы читаем A2:T, то data[0] - это A2 (Header). data[1] - это A3 (Data).
-        # Значит row_idx=1 соответствует A3.
-        # В Google Sheets это строка 3.
-        # Но мы читаем диапазон A2:T.
-        # Если row_idx=1 (первая строка данных), это 2-я строка в массиве data.
-        # data[0] = Row 2 (Header). data[1] = Row 3.
-        # Значит sheet_row_num = row_idx + 2. (1+2=3). Correct.
+        # row_idx starts from 1 (data start) -> sheet row 2 (header) -> row 3 (data)
         sheet_row_num = row_idx + 2
         
         # Извлекаем админа для всех ошибок в этой строке
