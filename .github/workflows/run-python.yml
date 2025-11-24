@@ -27,4 +27,4 @@ jobs:
 
       - name: Run Python script
         run: |
-          python your_script.py "${{ github.event.inputs.param }}"
+          python runner.py "${{ github.event.inputs.param }}"
