@@ -81,9 +81,9 @@ class TrainingsValidator(BaseValidator):
                 
                 # Кастомные сообщения и логика
                 if col_name == "Начало":
-                    description = "Отсутствует время начала"
+                    description = "Отсутствует время начала смены"
                 elif col_name == "Конец":
-                    description = "Отсутствует время окончания"
+                    description = "Отсутствует время окончания смены"
                 elif col_name == "Дата":
                     description = "Отсутствует дата"
                 elif col_name == "Сотрудник":

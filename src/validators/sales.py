@@ -164,7 +164,7 @@ class SalesValidator(BaseValidator):
                     row_number=sheet_row_num,
                     column="Внесли в CRM",
                     error_type="process_error",
-                    description="Для товаров 'Внесли в CRM' должно быть FALSE",
+                    description="Продажи товаров в CRM вносить не нужно",
                     cell_link=self._generate_link(sheet_row_num - 1, "Внесли в CRM"),
                     sheet_name=self.sheet_name,
                     admin=admin
@@ -186,11 +186,13 @@ class SalesValidator(BaseValidator):
             # Эвотор
             is_debt_return = "долг" in str(training_type).lower() or "долг" in str(product).lower()
             if final_price > 0 and not is_debt_return and not is_evotor:
+                 # Форматируем дату для описания
+                 date_str = dt.strftime("%d.%m.%Y") if dt else str(date_val)
                  errors.append(ValidationError(
                     row_number=sheet_row_num,
                     column="Пробили на эвоторе",
                     error_type="process_error",
-                    description="Чек не пробит на Эвоторе",
+                    description=f"Чек не пробит на Эвоторе ({date_str})",
                     cell_link=self._generate_link(sheet_row_num - 1, "Пробили на эвоторе"),
                     sheet_name=self.sheet_name,
                     admin=admin
