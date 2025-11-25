@@ -32,8 +32,8 @@ jobs:
       run: mkdir -p secrets
 
     - name: Create service account file
-      # Создаем файл ключа из секрета GitHub
-      run: echo "${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}" > secrets/service_account.json
+      # Создаем файл ключа из секрета GitHub (используем printf для корректной обработки переносов строк)
+      run: printf '%s\n' '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}' > secrets/service_account.json
 
     - name: Run validator
       env:
