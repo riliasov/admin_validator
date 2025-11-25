@@ -8,6 +8,9 @@ class LeadsValidator(BaseValidator):
     Валидатор для таблицы Обращения.
     """
     
+    def _add_date_to_description(self, description: str, date_str: str) -> str:
+        """Добавляет дату в скобках к описанию ошибки."""
+        return f"{description} ({date_str})"
 
 
     def _validate_phone_format(self, phone: str) -> bool:
@@ -29,6 +32,12 @@ class LeadsValidator(BaseValidator):
         # Извлекаем админа для ошибок создания лида
         lead_admin_val = self._get_val(row, "Админ (создал лида)")
         lead_admin = str(lead_admin_val).strip() if lead_admin_val else "Уточнить"
+        
+        # Извлекаем и форматируем дату обращения
+        from src.utils import parse_date_value
+        date_val = self._get_val(row, "Дата обращения")
+        dt = parse_date_value(date_val)
+        formatted_date = dt.strftime("%d.%m.%Y") if dt else str(date_val) if date_val else ""
 
         # 1. Проверка обязательных полей (Создание лида)
         # Используем стандартный механизм BaseValidator, так как теперь имена уникальны
@@ -36,11 +45,14 @@ class LeadsValidator(BaseValidator):
             val = self._get_val(row, col_name)
             
             if not val:
+                desc = f"Поле '{col_name}' обязательно для создания лида"
+                if formatted_date:
+                    desc = self._add_date_to_description(desc, formatted_date)
                 errors.append(ValidationError(
                     row_number=sheet_row_num,
                     column=col_name,
                     error_type="empty",
-                    description=f"Поле '{col_name}' обязательно для создания лида",
+                    description=desc,
                     cell_link=self._generate_link(sheet_row_num - 1, col_name),
                     sheet_name=self.sheet_name,
                     admin=lead_admin

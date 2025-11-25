@@ -21,6 +21,10 @@ class TrainingsValidator(BaseValidator):
         "Посетили"
     ]
 
+    def _add_date_to_description(self, description: str, date_str: str) -> str:
+        """Добавляет дату в скобках к описанию ошибки."""
+        return f"{description} ({date_str})"
+
     def validate_row(self, row_idx: int, row: List[str]) -> List[ValidationError]:
         """
         Проверяет строку тренировки на корректность данных.
@@ -59,6 +63,9 @@ class TrainingsValidator(BaseValidator):
             if dt > today:
                 return [] # Игнорируем будущие даты
         
+        # Форматируем дату для передачи в ValidationError
+        formatted_date = dt.strftime("%d.%m.%Y") if dt else str(date_val)
+        
         # 0.1 Исключение для Администратора (пустой день)
         training_type = self._get_val(row, "Тип")
         
@@ -81,9 +88,9 @@ class TrainingsValidator(BaseValidator):
                 
                 # Кастомные сообщения и логика
                 if col_name == "Начало":
-                    description = "Отсутствует время начала смены"
+                    description = self._add_date_to_description("Отсутствует время начала смены", formatted_date)
                 elif col_name == "Конец":
-                    description = "Отсутствует время окончания смены"
+                    description = self._add_date_to_description("Отсутствует время окончания смены", formatted_date)
                 elif col_name == "Дата":
                     description = "Отсутствует дата"
                 elif col_name == "Сотрудник":
@@ -146,7 +153,7 @@ class TrainingsValidator(BaseValidator):
                             row_number=sheet_row_num,
                             column="Статус",
                             error_type="invalid_value",
-                            description=f"Статус '{status}' недопустим для прошедших дат",
+                            description=self._add_date_to_description(f"Статус '{status}' недопустим для прошедших дат", formatted_date),
                             cell_link=self._generate_link(row_idx, "Статус"),
                             sheet_name=self.sheet_name,
                             admin=admin

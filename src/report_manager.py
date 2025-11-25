@@ -134,7 +134,7 @@ class ReportManager:
 
         # 2. Обработка НОВЫХ ошибок (те, что остались в new_errors_map)
         for uid, error in new_errors_map.items():
-            # Получаем текущую дату в формате ДД.ММ.ГГГГ
+            # Получаем текущую дату в формате ДД.ММ.ГГГГ (дата создания задачи)
             from datetime import datetime
             today = datetime.now().strftime("%d.%m.%Y")
             

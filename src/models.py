@@ -11,6 +11,7 @@ class ValidationError(BaseModel):
         error_type: Тип ошибки (empty, invalid_format, missing_column)
         description: Описание ошибки
         cell_link: Ссылка на ячейку в Google Sheets
+        error_date: Дата из строки данных (дата продажи/тренировки)
     """
     row_number: int
     column: str
@@ -19,6 +20,7 @@ class ValidationError(BaseModel):
     cell_link: str
     sheet_name: str = ""  # Добавлено для генерации ID
     admin: str = ""  # Администратор, ответственный за ошибку
+    error_date: str = ""  # Дата из строки данных (ДД.ММ.ГГГГ)
 
     @property
     def uid(self) -> str:

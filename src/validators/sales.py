@@ -7,6 +7,10 @@ from .base import BaseValidator
 class SalesValidator(BaseValidator):
     """Валидатор для таблицы продаж."""
     
+    def _add_date_to_description(self, description: str, date_str: str) -> str:
+        """Добавляет дату в скобках к описанию ошибки."""
+        return f"{description} ({date_str})"
+
 
     def validate_row(self, row_idx: int, row: List[Any]) -> List[ValidationError]:
         """
@@ -33,6 +37,9 @@ class SalesValidator(BaseValidator):
         today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
         if dt > today:
             return []
+        
+        # Форматируем дату для передачи в ValidationError
+        formatted_date = dt.strftime("%d.%m.%Y")
 
         # 0.1 Проверка на "Уточнить"
         for col_name in self.required_columns:
@@ -45,7 +52,8 @@ class SalesValidator(BaseValidator):
                     description=f"Требуется уточнение: {val}",
                     cell_link=self._generate_link(sheet_row_num - 1, col_name),
                     sheet_name=self.sheet_name,
-                    admin=admin
+                    admin=admin,
+                    error_date=formatted_date
                 ))
 
         # 1. Какие строки надо проверять
@@ -164,7 +172,7 @@ class SalesValidator(BaseValidator):
                     row_number=sheet_row_num,
                     column="Внесли в CRM",
                     error_type="process_error",
-                    description="Продажи товаров в CRM вносить не нужно",
+                    description=self._add_date_to_description("Продажи товаров в CRM вносить не нужно", formatted_date),
                     cell_link=self._generate_link(sheet_row_num - 1, "Внесли в CRM"),
                     sheet_name=self.sheet_name,
                     admin=admin
@@ -177,7 +185,7 @@ class SalesValidator(BaseValidator):
                     row_number=sheet_row_num,
                     column="Внесли в CRM",
                     error_type="process_error",
-                    description="Продажа не внесена в CRM",
+                    description=self._add_date_to_description("Продажа не внесена в CRM", formatted_date),
                     cell_link=self._generate_link(sheet_row_num - 1, "Внесли в CRM"),
                     sheet_name=self.sheet_name,
                     admin=admin
@@ -186,13 +194,11 @@ class SalesValidator(BaseValidator):
             # Эвотор
             is_debt_return = "долг" in str(training_type).lower() or "долг" in str(product).lower()
             if final_price > 0 and not is_debt_return and not is_evotor:
-                 # Форматируем дату для описания
-                 date_str = dt.strftime("%d.%m.%Y") if dt else str(date_val)
                  errors.append(ValidationError(
                     row_number=sheet_row_num,
                     column="Пробили на эвоторе",
                     error_type="process_error",
-                    description=f"Чек не пробит на Эвоторе ({date_str})",
+                    description=self._add_date_to_description("Чек не пробит на Эвоторе", formatted_date),
                     cell_link=self._generate_link(sheet_row_num - 1, "Пробили на эвоторе"),
                     sheet_name=self.sheet_name,
                     admin=admin
