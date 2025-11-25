@@ -133,16 +133,35 @@ class TrainingsValidator(BaseValidator):
                     ))
         
         # 2. Проверка валидности статуса
-        if status and status not in self.VALID_STATUSES:
-            errors.append(ValidationError(
-                row_number=sheet_row_num,
-                column="Статус",
-                error_type="invalid_value",
-                description=f"Недопустимый статус: '{status}'",
-                cell_link=self._generate_link(row_idx, "Статус"),
-                sheet_name=self.sheet_name,
-                admin=admin
-            ))
+        if status:
+            # Специфичная логика для статусов подтверждения
+            confirmation_statuses = ["Подтвердили", "Не подтвердили"]
+            
+            if status in confirmation_statuses:
+                # Разрешены только в будущем (включая сегодня)
+                if dt:
+                    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+                    if dt < today:
+                        errors.append(ValidationError(
+                            row_number=sheet_row_num,
+                            column="Статус",
+                            error_type="invalid_value",
+                            description=f"Статус '{status}' недопустим для прошедших дат",
+                            cell_link=self._generate_link(row_idx, "Статус"),
+                            sheet_name=self.sheet_name,
+                            admin=admin
+                        ))
+            elif status not in self.VALID_STATUSES:
+                # Для остальных статусов - стандартная проверка по белому списку
+                errors.append(ValidationError(
+                    row_number=sheet_row_num,
+                    column="Статус",
+                    error_type="invalid_value",
+                    description=f"Недопустимый статус: '{status}'",
+                    cell_link=self._generate_link(row_idx, "Статус"),
+                    sheet_name=self.sheet_name,
+                    admin=admin
+                ))
         
         # 3. Проверка: Если Клиент заполнен, то Сотрудник обязателен (кроме исключений)
         if client and client != "Администратор":
