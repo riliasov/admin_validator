@@ -44,7 +44,7 @@ def main():
         sales_sheet_id = client.get_sheet_id_by_name(config.sales_sheet) or sales_sheet_id
         trainings_sheet_id = client.get_sheet_id_by_name(config.trainings_sheet) or trainings_sheet_id
         leads_sheet_id = client.get_sheet_id_by_name(config.leads_sheet) or leads_sheet_id
-        logger.info(f"🆔 ID листов: Sales={sales_sheet_id}, Trainings={trainings_sheet_id}, Leads={leads_sheet_id}")
+        # logger.info(f"🆔 ID листов: Sales={sales_sheet_id}, Trainings={trainings_sheet_id}, Leads={leads_sheet_id}")
     except Exception as e:
         logger.error(f"❌ Не удалось получить ID листов: {e}. Используем fallback ID.")
         # Fallback IDs are already set above
@@ -69,7 +69,7 @@ def main():
             sales_errors = sales_validator.validate()
             
             if sales_errors:
-                logger.info(f"📋 Продажи: найдено {len(sales_errors)} ошибок")
+                logger.info(f"📋 Продажи: найдено {len(sales_errors)} ошибок ({time.time() - t_sales:.2f} сек)")
                 all_errors.extend(sales_errors)
 
     except Exception as e:
@@ -90,7 +90,7 @@ def main():
         trainings_errors = trainings_validator.validate()
         
         if trainings_errors:
-            logger.info(f"📋 Тренировки: найдено {len(trainings_errors)} ошибок")
+            logger.info(f"📋 Тренировки: найдено {len(trainings_errors)} ошибок ({time.time() - t_trainings:.2f} сек)")
             all_errors.extend(trainings_errors)
             
     except Exception as e:
@@ -112,7 +112,7 @@ def main():
         leads_errors = leads_validator.validate()
         
         if leads_errors:
-            logger.info(f"📋 Обращения: найдено {len(leads_errors)} ошибок")
+            logger.info(f"📋 Обращения: найдено {len(leads_errors)} ошибок ({time.time() - t_leads:.2f} сек)")
             all_errors.extend(leads_errors)
             
     except Exception as e:

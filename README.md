@@ -34,11 +34,33 @@ source .venv/bin/activate   # macOS/Linux
 pip3 install -r requirements.txt
 
 
-### Запуск проверки
+## Использование
 
-```bash
-python -m src.runner
-```
+### Ручной запуск
+
+1. Убедитесь, что виртуальное окружение активировано:
+   ```bash
+   source .venv/bin/activate
+   ```
+2. Запустите скрипт:
+   ```bash
+   python -m src.runner
+   ```
+
+### Автоматический запуск (GitHub Actions)
+
+Проект настроен для автоматического запуска через GitHub Actions (файл `.github/workflows/etl.yml`).
+
+**Для настройки:**
+1. Перейдите в настройки репозитория на GitHub: `Settings` -> `Secrets and variables` -> `Actions`.
+2. Добавьте следующие секреты (`New repository secret`):
+   - `GCP_SERVICE_ACCOUNT_KEY`: содержимое вашего файла `secrets/service_account.json`.
+   - `SALES_SHEET_ID`: ID таблицы продаж (необязательно, если есть fallback).
+   - `TRAININGS_SHEET_ID`: ID таблицы тренировок.
+   - `LEADS_SHEET_ID`: ID таблицы обращений.
+
+**Расписание:**
+По умолчанию скрипт запускается каждый час (настраивается в `etl.yml` через cron).
 
 ### Пример вывода
 
