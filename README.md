@@ -26,60 +26,13 @@ cd admin_validator
 
 ### 2. Установка зависимостей
 
-```bash
-pip install -r requirements.txt
-```
+# Создать и активировать виртуальное окружение (один раз)
+python3 -m venv .venv
+source .venv/bin/activate   # macOS/Linux
 
-## Настройка
+# Установить зависимости в виртуальном окружении
+pip3 install -r requirements.txt
 
-### 1. Google Service Account
-
-1. Перейдите в [Google Cloud Console](https://console.cloud.google.com)
-2. Создайте новый проект или выберите существующий
-3. Включите **Google Sheets API**
-4. Создайте **Service Account**
-5. Скачайте JSON-ключ
-6. Сохраните файл как `service_account.json` в корне проекта
-7. Откройте вашу Google Sheets таблицу
-8. Нажмите "Поделиться" и добавьте email сервисного аккаунта (из JSON-файла: `client_email`)
-
-### 2. Переменные окружения
-
-Создайте файл `.env` на основе `.env.example`:
-
-```bash
-cp .env.example .env
-```
-
-Отредактируйте `.env` и укажите ваши значения:
-
-```env
-# ID вашей Google Sheets таблицы (из URL)
-SPREADSHEET_ID=your_actual_spreadsheet_id
-
-# Названия листов (можно оставить по умолчанию)
-SALES_SHEET=Продажи
-TRAININGS_SHEET=Тренировки
-LEADS_SHEET=Обращения
-REPORT_SHEET=Задачи
-
-# Путь к файлу с ключом
-SERVICE_ACCOUNT_FILE=service_account.json
-
-# База данных (для будущего использования)
-DATABASE_URL=postgresql://user:password@localhost:5432/planeta
-```
-
-### Как найти SPREADSHEET_ID
-
-URL вашей таблицы выглядит так:
-```
-https://docs.google.com/spreadsheets/d/1ABC...XYZ/edit
-                                      ^^^^^^^^
-                                      Это ваш ID
-```
-
-## Использование
 
 ### Запуск проверки
 
@@ -184,11 +137,3 @@ sales_quality_checker/
 - [ ] Расписание автозапусков (cron/GitHub Actions)
 - [ ] Dashboard с метриками качества данных
 - [ ] История изменений ошибок
-
-## Лицензия
-
-MIT
-
-## Поддержка
-
-По вопросам и предложениям создавайте Issues в репозитории.
