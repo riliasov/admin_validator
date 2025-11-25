@@ -4,7 +4,12 @@ on:
   schedule:
     - cron: '0 * * * *' # Запуск каждый час
   workflow_dispatch: # Возможность ручного запуска
-
+    inputs:
+      param:
+        description: "trigger source"
+        required: false
+        default: "manual"
+        
 jobs:
   validate:
     runs-on: ubuntu-latest
