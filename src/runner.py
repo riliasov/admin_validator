@@ -30,6 +30,18 @@ def main():
 
     try:
         client = SheetsClient(config.spreadsheet_id, config.service_account_file)
+        
+        # --- DEBUG LOGGING ---
+        try:
+            # Пытаемся достать email из credentials
+            service_account_email = client.service._http.credentials.service_account_email
+            logger.info(f"📧 Service Account Email: {service_account_email}")
+        except Exception:
+            logger.info("📧 Service Account Email: Could not determine")
+            
+        logger.info(f"📄 Target Spreadsheet ID: {config.spreadsheet_id}")
+        # ---------------------
+
         logger.info("✅ Google Sheets клиент инициализирован.")
     except Exception as e:
         logger.critical(f"❌ Ошибка инициализации клиента Google Sheets: {e}")
