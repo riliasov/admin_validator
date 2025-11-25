@@ -39,6 +39,10 @@ jobs:
       env:
         # Передаем ID таблицы через переменную окружения
         SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
-        # Если названия листов отличаются от стандартных, их тоже можно добавить сюда:
-        # SALES_SHEET: "Продажи 2024"
+        # Явно указываем путь к файлу ключа (тот же, что создали шагом выше)
+        SERVICE_ACCOUNT_FILE: secrets/service_account.json
+        # Явно указываем названия листов
+        SALES_SHEET: "Продажи"
+        TRAININGS_SHEET: "Тренировки"
+        LEADS_SHEET: "Обращения"
       run: python -m src.runner
