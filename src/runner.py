@@ -141,7 +141,7 @@ def main():
         
         logger.info(f"📊 Итого задач: {len(active_rows)} ({len([r for r in active_rows if r.is_manual])} ручных)")
         
-        report_content = [ReportManager.HEADERS] + [item.to_row() for item in active_rows]
+        report_content = [report_manager.get_headers()] + [item.to_row() for item in active_rows]
         
         client.write_report(config.report_sheet, report_content)
         client.format_report_sheet(config.report_sheet)

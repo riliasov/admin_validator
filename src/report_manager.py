@@ -43,6 +43,25 @@ class ReportManager:
 
     def __init__(self):
         pass
+    
+    @staticmethod
+    def get_headers() -> list[str]:
+        """
+        Генерирует заголовки с текущим временем в колонке Описание.
+        Формат: "Описание (последнее обновление 24 ноября в 23:24)"
+        """
+        from datetime import datetime
+        
+        now = datetime.now()
+        months = [
+            "января", "февраля", "марта", "апреля", "мая", "июня",
+            "июля", "августа", "сентября", "октября", "ноября", "декабря"
+        ]
+        month_name = months[now.month - 1]
+        time_str = f"{now.day} {month_name} в {now.hour:02d}:{now.minute:02d}"
+        description_header = f"Описание (последнее обновление {time_str})"
+        
+        return ["ID", "Manual task", "Дата", "Лист", "Тип", "Админ", description_header, "Ссылка"]
 
     def parse_existing_report(self, rows: List[List[str]]) -> Dict[str, ReportItem]:
         """
