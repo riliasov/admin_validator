@@ -76,11 +76,14 @@ class LeadsValidator(BaseValidator):
             for field in client_fields:
                 val = self._get_val(row, field)
                 if not val:
+                    desc = f"Поле '{field}' обязательно при создании клиента"
+                    if formatted_date:
+                        desc = self._add_date_to_description(desc, formatted_date)
                     errors.append(ValidationError(
                         row_number=sheet_row_num,
                         column=field,
                         error_type="empty",
-                        description=f"Поле '{field}' обязательно при создании клиента",
+                        description=desc,
                         cell_link=self._generate_link(sheet_row_num - 1, field),
                         sheet_name=self.sheet_name,
                         admin=client_admin  # Берём из L!
@@ -89,11 +92,14 @@ class LeadsValidator(BaseValidator):
             # Проверка телефона
             phone = self._get_val(row, "Мобильный")
             if not self._validate_phone_format(phone):
+                desc = "Телефон должен быть в формате 79XXXXXXXXX (11 цифр)"
+                if formatted_date:
+                    desc = self._add_date_to_description(desc, formatted_date)
                 errors.append(ValidationError(
                     row_number=sheet_row_num,
                     column="Мобильный",
                     error_type="invalid_format",
-                    description="Телефон должен быть в формате 79XXXXXXXXX (11 цифр)",
+                    description=desc,
                     cell_link=self._generate_link(sheet_row_num - 1, "Мобильный"),
                     sheet_name=self.sheet_name,
                     admin=client_admin
@@ -104,11 +110,14 @@ class LeadsValidator(BaseValidator):
         core_filled = all(self._get_val(row, f) for f in client_core_fields)
         
         if core_filled and not client_admin_val:
+            desc = "Админ (создал клиента) обязателен если заполнены данные клиента"
+            if formatted_date:
+                desc = self._add_date_to_description(desc, formatted_date)
             errors.append(ValidationError(
                 row_number=sheet_row_num,
                 column="Админ (создал клиента)",
                 error_type="empty",
-                description="Админ (создал клиента) обязателен если заполнены данные клиента",
+                description=desc,
                 cell_link=self._generate_link(sheet_row_num - 1, "Админ (создал клиента)"),
                 sheet_name=self.sheet_name,
                 admin="Уточнить"
@@ -117,11 +126,14 @@ class LeadsValidator(BaseValidator):
             # Проверка телефона
             phone = self._get_val(row, "Мобильный")
             if not self._validate_phone_format(phone):
+                desc = "Телефон должен быть в формате 79XXXXXXXXX (11 цифр)"
+                if formatted_date:
+                    desc = self._add_date_to_description(desc, formatted_date)
                 errors.append(ValidationError(
                     row_number=sheet_row_num,
                     column="Мобильный",
                     error_type="invalid_format",
-                    description="Телефон должен быть в формате 79XXXXXXXXX (11 цифр)",
+                    description=desc,
                     cell_link=self._generate_link(sheet_row_num - 1, "Мобильный"),
                     sheet_name=self.sheet_name,
                     admin="Уточнить"
