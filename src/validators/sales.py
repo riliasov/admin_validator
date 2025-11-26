@@ -221,7 +221,7 @@ class SalesValidator(BaseValidator):
                     row_number=sheet_row_num,
                     column="Комментарий",
                     error_type="empty",
-                    description="Уточнить повод для подарка занятия",
+                    description=self._add_date_to_description("Уточнить повод для подарка занятия", formatted_date),
                     cell_link=self._generate_link(sheet_row_num - 1, "Комментарий"),
                     sheet_name=self.sheet_name,
                     admin=admin
@@ -233,7 +233,7 @@ class SalesValidator(BaseValidator):
                     row_number=sheet_row_num,
                     column="Комментарий",
                     error_type="empty",
-                    description="Уточнить причину возврата абонемента",
+                    description=self._add_date_to_description("Уточнить причину возврата абонемента", formatted_date),
                     cell_link=self._generate_link(sheet_row_num - 1, "Комментарий"),
                     sheet_name=self.sheet_name,
                     admin=admin
@@ -245,7 +245,7 @@ class SalesValidator(BaseValidator):
                     row_number=sheet_row_num,
                     column="Комментарий",
                     error_type="empty",
-                    description="Уточнить причину перерасчёта",
+                    description=self._add_date_to_description("Уточнить причину перерасчёта", formatted_date),
                     cell_link=self._generate_link(sheet_row_num - 1, "Комментарий"),
                     sheet_name=self.sheet_name,
                     admin=admin
@@ -257,7 +257,7 @@ class SalesValidator(BaseValidator):
                     row_number=sheet_row_num,
                     column="Комментарий",
                     error_type="empty",
-                    description="Уточнить информацию о сертификате",
+                    description=self._add_date_to_description("Уточнить информацию о сертификате", formatted_date),
                     cell_link=self._generate_link(sheet_row_num - 1, "Комментарий"),
                     sheet_name=self.sheet_name,
                     admin=admin
@@ -270,7 +270,7 @@ class SalesValidator(BaseValidator):
                     row_number=sheet_row_num,
                     column="Комментарий",
                     error_type="empty",
-                    description="При скидке 100% обязателен комментарий",
+                    description=self._add_date_to_description("При скидке 100% обязателен комментарий", formatted_date),
                     cell_link=self._generate_link(sheet_row_num - 1, "Комментарий"),
                     sheet_name=self.sheet_name,
                     admin=admin
