@@ -51,10 +51,13 @@ class ReportManager:
         Формат: "Описание (последнее обновление 24 ноября в 23:24)"
         Время в GMT+5 (UTC+5).
         """
-        from datetime import datetime, timedelta
+        from datetime import datetime, timedelta, timezone
         
-        # Текущее время UTC +5 часов
-        now = datetime.utcnow() + timedelta(hours=5)
+        # Explicitly define UTC+5 timezone
+        tz_gmt_plus_5 = timezone(timedelta(hours=5))
+        
+        # Get current time in UTC, then convert to target timezone
+        now = datetime.now(timezone.utc).astimezone(tz_gmt_plus_5)
         
         months = [
             "января", "февраля", "марта", "апреля", "мая", "июня",
