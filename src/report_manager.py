@@ -16,6 +16,7 @@ class ReportItem:
     link: str
     created_date: str = ""  # Дата создания задачи
     admin: str = ""  # Администратор, будет заполнен позже
+    last_updated: str = ""  # ISO timestamp последнего обновления
 
     def to_row(self) -> List[str]:
         """Преобразует объект в список для записи в Google Sheets."""
@@ -23,6 +24,22 @@ class ReportItem:
         if self.link and self.link.startswith("http"):
             label = "Посмотреть"
             link_val = f'=HYPERLINK("{self.link}"; "{label}")'
+        
+        # Формируем описание с временем последнего обновления
+        description_with_time = self.description
+        if self.last_updated:
+            try:
+                dt = datetime.fromisoformat(self.last_updated)
+                # Месяцы на русском (родительный падеж)
+                months = [
+                    "января", "февраля", "марта", "апреля", "мая", "июня",
+                    "июля", "августа", "сентября", "октября", "ноября", "декабря"
+                ]
+                month_name = months[dt.month - 1]
+                time_str = f"{dt.day} {month_name} в {dt.hour:02d}:{dt.minute:02d}"
+                description_with_time = f"{self.description} (последнее обновление {time_str})"
+            except (ValueError, AttributeError):
+                pass  # Если timestamp некорректный, оставляем описание как есть
 
         return [
             self.uid,
@@ -31,15 +48,16 @@ class ReportItem:
             self.sheet,
             self.error_column,
             self.admin,
-            self.description,
-            link_val
+            description_with_time,
+            link_val,
+            self.last_updated  # Новая колонка I для хранения timestamp
         ]
 
 
 class ReportManager:
     """Менеджер управления состоянием отчета."""
 
-    HEADERS = ["ID", "Manual task", "Дата", "Лист", "Тип", "Админ", "Описание", "Ссылка"]
+    HEADERS = ["ID", "Manual task", "Дата", "Лист", "Тип", "Админ", "Описание", "Ссылка", "Last Updated"]
 
     def __init__(self):
         pass
@@ -81,8 +99,14 @@ class ReportManager:
                 else:
                     continue
 
-            # Структура: ID, Manual task, Дата, Лист, Тип, Описание, Ссылка
-            # Indices: 0, 1, 2, 3, 4, 5, 6
+            # Структура: ID, Manual task, Дата, Лист, Тип, Админ, Описание, Ссылка, Last Updated
+            # Indices: 0, 1, 2, 3, 4, 5, 6, 7, 8
+            
+            # Извлекаем описание без timestamp (если он был добавлен ранее)
+            description = row[6] if len(row) > 6 else ""
+            # Убираем старый timestamp из описания, если он там есть
+            import re
+            description = re.sub(r'\s*\(последнее обновление.*?\)\s*$', '', description)
             
             item = ReportItem(
                 uid=uid,
@@ -91,8 +115,9 @@ class ReportManager:
                 sheet=row[3] if len(row) > 3 else "",
                 error_column=row[4] if len(row) > 4 else "",
                 admin=row[5] if len(row) > 5 else "",
-                description=row[6] if len(row) > 6 else "",
-                link=row[7] if len(row) > 7 else ""
+                description=description,
+                link=row[7] if len(row) > 7 else "",
+                last_updated=row[8] if len(row) > 8 else ""  # Новая колонка I
             )
             items[uid] = item
         
@@ -121,6 +146,7 @@ class ReportManager:
                 item.error_column = new_err.column # Обновляем колонку если вдруг изменилась
                 item.sheet = new_err.sheet_name # Обновляем лист если вдруг изменился
                 item.admin = new_err.admin # Обновляем админа
+                item.last_updated = datetime.now().isoformat()  # Обновляем timestamp
                 
                 active_items.append(item)
                 # Удаляем из map, чтобы пометить как обработанную
@@ -137,6 +163,7 @@ class ReportManager:
             # Получаем текущую дату в формате ДД.ММ.ГГГГ (дата создания задачи)
             from datetime import datetime
             today = datetime.now().strftime("%d.%m.%Y")
+            now_iso = datetime.now().isoformat()
             
             new_item = ReportItem(
                 uid=uid,
@@ -146,7 +173,8 @@ class ReportManager:
                 error_column=error.column,
                 admin=error.admin,
                 description=error.description,
-                link=error.cell_link
+                link=error.cell_link,
+                last_updated=now_iso  # Устанавливаем timestamp для новой ошибки
             )
             active_items.append(new_item)
 
