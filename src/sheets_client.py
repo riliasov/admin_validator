@@ -7,6 +7,60 @@
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import os
+import time
+import random
+import logging
+from functools import wraps
+from googleapiclient.errors import HttpError
+
+logger = logging.getLogger(__name__)
+
+def retry_api_call(max_retries=5, initial_delay=1.0, backoff_factor=2.0):
+    """
+    Декоратор для повторного выполнения API вызовов при ошибках 5xx.
+    Использует экспоненциальную задержку с jitter.
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            delay = initial_delay
+            last_exception = None
+            
+            for attempt in range(max_retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except HttpError as e:
+                    last_exception = e
+                    # Проверяем статус код (500, 502, 503, 504)
+                    if e.resp.status in [500, 502, 503, 504]:
+                        if attempt == max_retries:
+                            logger.error(f"❌ API call failed after {max_retries} retries: {e}")
+                            raise
+                        
+                        sleep_time = delay + random.uniform(0, 0.5)
+                        logger.warning(f"⚠️ API Error {e.resp.status}. Retrying in {sleep_time:.2f}s (Attempt {attempt + 1}/{max_retries})...")
+                        time.sleep(sleep_time)
+                        delay *= backoff_factor
+                    else:
+                        # Если ошибка не связана с доступностью сервиса, пробрасываем сразу
+                        raise
+                except Exception as e:
+                    # Для других ошибок (например, socket timeout) тоже можно попробовать повторить
+                    last_exception = e
+                    if attempt == max_retries:
+                        logger.error(f"❌ Unexpected error after {max_retries} retries: {e}")
+                        raise
+                    
+                    sleep_time = delay + random.uniform(0, 0.5)
+                    logger.warning(f"⚠️ Unexpected Error: {e}. Retrying in {sleep_time:.2f}s (Attempt {attempt + 1}/{max_retries})...")
+                    time.sleep(sleep_time)
+                    delay *= backoff_factor
+            
+            if last_exception:
+                raise last_exception
+                
+        return wrapper
+    return decorator
 
 
 class SheetsClient:
@@ -75,6 +129,7 @@ class SheetsClient:
             range=sheet_name
         ).execute()
         return result.get('values', [])
+    @retry_api_call()
     def read_data(self, sheet_name: str, range_name: str = None, value_render_option: str = 'FORMATTED_VALUE') -> list[list[str]]:
         """
         Читает данные из указанного листа.
@@ -100,6 +155,7 @@ class SheetsClient:
         return result.get('values', [])
 
 
+    @retry_api_call()
     def write_report(self, sheet_name: str, rows: list[list[str]]):
         """
         Перезаписывает лист отчета новыми данными.
@@ -133,6 +189,7 @@ class SheetsClient:
         """
         return self.get_sheet_values(sheet_name)
 
+    @retry_api_call()
     def format_report_sheet(self, sheet_name: str):
         """
         Применяет форматирование к листу отчета.
@@ -202,6 +259,7 @@ class SheetsClient:
             body=body
         ).execute()
 
+    @retry_api_call()
     def get_sheet_id_by_name(self, sheet_name: str) -> int:
         """Получает sheetId по названию листа."""
         spreadsheet = self.service.spreadsheets().get(spreadsheetId=self.spreadsheet_id).execute()
