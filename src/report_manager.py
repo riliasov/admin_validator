@@ -49,10 +49,13 @@ class ReportManager:
         """
         Генерирует заголовки с текущим временем в колонке Описание.
         Формат: "Описание (последнее обновление 24 ноября в 23:24)"
+        Время в GMT+5 (UTC+5).
         """
-        from datetime import datetime
+        from datetime import datetime, timedelta
         
-        now = datetime.now()
+        # Текущее время UTC +5 часов
+        now = datetime.utcnow() + timedelta(hours=5)
+        
         months = [
             "января", "февраля", "марта", "апреля", "мая", "июня",
             "июля", "августа", "сентября", "октября", "ноября", "декабря"
