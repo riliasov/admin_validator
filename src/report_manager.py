@@ -46,14 +46,9 @@ class ReportManager:
     
     @staticmethod
     def get_headers() -> list[str]:
-        """
-        Генерирует заголовки с текущим временем в колонке Описание.
-        Формат: "Описание (последнее обновление 24 ноября в 23:24)"
-        Время в GMT+5 (UTC+5).
-        """
-        from datetime import datetime, timedelta, timezone
+        """Генерирует заголовки с временем обновления (GMT+5)."""
+        from datetime import timezone, timedelta
         
-        # Explicitly define UTC+5 timezone
         tz_gmt_plus_5 = timezone(timedelta(hours=5))
         
         # Get current time in UTC, then convert to target timezone
@@ -70,10 +65,7 @@ class ReportManager:
         return ["ID", "Manual task", "Дата", "Лист", "Тип", "Админ", description_header, "Ссылка"]
 
     def parse_existing_report(self, rows: List[List[str]]) -> Dict[str, ReportItem]:
-        """
-        Парсит существующие строки отчета в словарь {uid: ReportItem}.
-        Пропускает заголовок.
-        """
+        """Парсит существующие строки отчета в словарь {uid: ReportItem}."""
         items = {}
         if not rows:
             return items
@@ -124,13 +116,7 @@ class ReportManager:
         return items
 
     def reconcile(self, existing_items: Dict[str, ReportItem], new_errors: List[ValidationError]) -> List[ReportItem]:
-        """
-        Сверяет текущее состояние с новыми ошибками.
-        Архивация удалена - возвращаем только активный список.
-        
-        Returns:
-            List[ReportItem]: Активные задачи
-        """
+        """Сверяет существующие задачи с новыми ошибками. Возвращает активные задачи."""
         active_items = []
         
         # Словарь новых ошибок для быстрого поиска
@@ -160,7 +146,6 @@ class ReportManager:
         # 2. Обработка НОВЫХ ошибок (те, что остались в new_errors_map)
         for uid, error in new_errors_map.items():
             # Получаем текущую дату в формате ДД.ММ.ГГГГ (дата создания задачи)
-            from datetime import datetime
             today = datetime.now().strftime("%d.%m.%Y")
             
             new_item = ReportItem(
@@ -209,13 +194,3 @@ class ReportManager:
         active_items.sort(key=sort_key)
 
         return active_items
-
-    def _get_date_sort_value(self, item: ReportItem) -> int:
-        """Возвращает числовое представление даты YYYYMMDD для сортировки."""
-        try:
-            parts = item.created_date.split('.')
-            if len(parts) == 3:
-                return int(f"{parts[2]}{parts[1]}{parts[0]}")
-        except:
-            pass
-        return 0

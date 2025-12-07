@@ -15,13 +15,12 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def main():
-    """Главная функция запуска валидации."""
+    """Запуск валидации данных в Google Sheets."""
     start_time = time.time()
     
     logging.info("🚀 Запуск Planeta Quality Checker...")
     
     try:
-        # Загрузка конфигурации
         config = load_config()
         logger.info("✅ Конфигурация загружена.")
     except Exception as e:
@@ -30,18 +29,6 @@ def main():
 
     try:
         client = SheetsClient(config.spreadsheet_id, config.service_account_file)
-        
-        # --- DEBUG LOGGING ---
-        try:
-            # Пытаемся достать email из credentials
-            service_account_email = client.service._http.credentials.service_account_email
-            logger.info(f"📧 Service Account Email: {service_account_email}")
-        except Exception:
-            logger.info("📧 Service Account Email: Could not determine")
-            
-        logger.info(f"📄 Target Spreadsheet ID: {config.spreadsheet_id}")
-        # ---------------------
-
         logger.info("✅ Google Sheets клиент инициализирован.")
     except Exception as e:
         logger.critical(f"❌ Ошибка инициализации клиента Google Sheets: {e}")
@@ -56,7 +43,6 @@ def main():
         sales_sheet_id = client.get_sheet_id_by_name(config.sales_sheet) or sales_sheet_id
         trainings_sheet_id = client.get_sheet_id_by_name(config.trainings_sheet) or trainings_sheet_id
         leads_sheet_id = client.get_sheet_id_by_name(config.leads_sheet) or leads_sheet_id
-        # logger.info(f"🆔 ID листов: Sales={sales_sheet_id}, Trainings={trainings_sheet_id}, Leads={leads_sheet_id}")
     except Exception as e:
         logger.error(f"❌ Не удалось получить ID листов: {e}. Используем fallback ID.")
         # Fallback IDs are already set above
@@ -145,10 +131,6 @@ def main():
         
         client.write_report(config.report_sheet, report_content)
         client.format_report_sheet(config.report_sheet)
-        
-    except Exception as e:
-        logger.critical(f"❌ Ошибка при формировании отчета: {e}")
-        sys.exit(1)
         
     except Exception as e:
         logger.critical(f"❌ Ошибка при формировании отчета: {e}")

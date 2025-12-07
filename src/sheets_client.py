@@ -16,10 +16,7 @@ from googleapiclient.errors import HttpError
 logger = logging.getLogger(__name__)
 
 def retry_api_call(max_retries=5, initial_delay=1.0, backoff_factor=2.0):
-    """
-    Декоратор для повторного выполнения API вызовов при ошибках 5xx.
-    Использует экспоненциальную задержку с jitter.
-    """
+    """Декоратор повтора API-вызовов при ошибках 5xx с экспоненциальной задержкой."""
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -76,13 +73,7 @@ class SheetsClient:
     SERVICE_ACCOUNT_FILE = 'service_account.json'
 
     def __init__(self, spreadsheet_id: str, service_account_file: str = None):
-        """
-        Инициализация клиента.
-        
-        Args:
-            spreadsheet_id: ID таблицы Google Sheets
-            service_account_file: Путь к файлу с ключом (опционально)
-        """
+        """Инициализация клиента Google Sheets."""
         self.spreadsheet_id = spreadsheet_id
         if service_account_file:
             self.SERVICE_ACCOUNT_FILE = service_account_file
@@ -90,15 +81,7 @@ class SheetsClient:
         self.service = self._authenticate()
 
     def _authenticate(self):
-        """
-        Аутентификация через сервисный аккаунт.
-        
-        Returns:
-            Resource: Объект API для работы с Sheets
-            
-        Raises:
-            FileNotFoundError: Если файл с ключом не найден
-        """
+        """Аутентификация через сервисный аккаунт."""
         if os.path.exists(self.SERVICE_ACCOUNT_FILE):
             creds = service_account.Credentials.from_service_account_file(
                 self.SERVICE_ACCOUNT_FILE, scopes=self.SCOPES)
@@ -114,15 +97,7 @@ class SheetsClient:
 
 
     def get_sheet_values(self, sheet_name: str) -> list[list[str]]:
-        """
-        Чтение всех значений из указанного листа.
-        
-        Args:
-            sheet_name: Название листа в таблице
-            
-        Returns:
-            list[list[str]]: Двумерный массив со значениями ячеек
-        """
+        """Чтение всех значений из указанного листа."""
         sheet = self.service.spreadsheets()
         result = sheet.values().get(
             spreadsheetId=self.spreadsheet_id,
@@ -131,17 +106,7 @@ class SheetsClient:
         return result.get('values', [])
     @retry_api_call()
     def read_data(self, sheet_name: str, range_name: str = None, value_render_option: str = 'FORMATTED_VALUE') -> list[list[str]]:
-        """
-        Читает данные из указанного листа.
-        
-        Args:
-            sheet_name: Название листа
-            range_name: Опциональный диапазон (например, "A1:B10"). Если не указан, читает весь лист.
-            value_render_option: Опция формата значений ('FORMATTED_VALUE' или 'UNFORMATTED_VALUE')
-            
-        Returns:
-            Список строк (список списков).
-        """
+        """Читает данные из листа. range_name — опциональный диапазон (A1:B10)."""
         full_range = sheet_name
         if range_name:
             full_range = f"{sheet_name}!{range_name}"
@@ -157,10 +122,7 @@ class SheetsClient:
 
     @retry_api_call()
     def write_report(self, sheet_name: str, rows: list[list[str]]):
-        """
-        Перезаписывает лист отчета новыми данными.
-        """
-        # Очистка листа
+        """Перезаписывает лист отчета новыми данными."""
         self.service.spreadsheets().values().clear(
             spreadsheetId=self.spreadsheet_id,
             range=sheet_name
@@ -181,22 +143,12 @@ class SheetsClient:
         ).execute()
 
     def read_report(self, sheet_name: str) -> list[list[str]]:
-        """
-        Читает все данные из листа отчета.
-        
-        Returns:
-            Список строк (список списков).
-        """
+        """Читает все данные из листа отчета."""
         return self.get_sheet_values(sheet_name)
 
     @retry_api_call()
     def format_report_sheet(self, sheet_name: str):
-        """
-        Применяет форматирование к листу отчета.
-        - Скрывает колонку ID (A)
-        - Добавляет чекбоксы в колонку Manual task (B)
-        - Закрепляет заголовок
-        """
+        """Форматирование листа отчета: скрытие ID, чекбоксы, заморозка заголовка."""
         sheet_id = self.get_sheet_id_by_name(sheet_name)
         if sheet_id is None:
             return

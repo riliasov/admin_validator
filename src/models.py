@@ -2,25 +2,15 @@ from pydantic import BaseModel
 import hashlib
 
 class ValidationError(BaseModel):
-    """
-    Модель ошибки валидации.
-    
-    Attributes:
-        row_number: Номер строки в таблице
-        column: Название колонки
-        error_type: Тип ошибки (empty, invalid_format, missing_column)
-        description: Описание ошибки
-        cell_link: Ссылка на ячейку в Google Sheets
-        error_date: Дата из строки данных (дата продажи/тренировки)
-    """
+    """Модель ошибки валидации."""
     row_number: int
     column: str
     error_type: str
     description: str
     cell_link: str
-    sheet_name: str = ""  # Добавлено для генерации ID
-    admin: str = ""  # Администратор, ответственный за ошибку
-    error_date: str = ""  # Дата из строки данных (ДД.ММ.ГГГГ)
+    sheet_name: str = ""
+    admin: str = ""
+    error_date: str = ""
 
     @property
     def uid(self) -> str:

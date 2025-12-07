@@ -193,7 +193,7 @@ class TrainingsValidator(BaseValidator):
                 row_number=sheet_row_num,
                 column="Комментарий",
                 error_type="formula_error",
-                description="Ошибка формулы в комментарии (#REF!)",
+                description="Ошибка в статусе тренировки (#REF!)",
                 cell_link=self._generate_link(row_idx, "Комментарий"),
                 sheet_name=self.sheet_name,
                 admin=admin
@@ -314,7 +314,7 @@ class TrainingsValidator(BaseValidator):
                             row_number=sheet_row_num,
                             column="Комментарий",
                             error_type="empty",
-                            description="Требуется комментарий об ответе клиента на предложение продлить абонемент",
+                            description="Нужен комментарий о предложении продлить абонемент",
                             cell_link=self._generate_link(row_idx, "Комментарий"),
                             sheet_name=self.sheet_name,
                             admin=admin

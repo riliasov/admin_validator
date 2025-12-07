@@ -1,6 +1,6 @@
 from typing import List, Any
 from src.models import ValidationError
-from src.utils import validate_phone_format
+from src.utils import validate_phone_format, parse_date_value
 from .base import BaseValidator
 
 class LeadsValidator(BaseValidator):
@@ -34,7 +34,6 @@ class LeadsValidator(BaseValidator):
         lead_admin = str(lead_admin_val).strip() if lead_admin_val else "Уточнить"
         
         # Извлекаем и форматируем дату обращения
-        from src.utils import parse_date_value
         date_val = self._get_val(row, "Дата обращения")
         dt = parse_date_value(date_val)
         formatted_date = dt.strftime("%d.%m.%Y") if dt else str(date_val) if date_val else ""

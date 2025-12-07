@@ -81,13 +81,5 @@ class AppConfig(BaseSettings):
 
 
 def load_config() -> AppConfig:
-    """
-    Загружает конфигурацию из переменных окружения.
-    
-    Returns:
-        AppConfig: Объект конфигурации приложения
-        
-    Raises:
-        ValidationError: Если обязательные переменные не установлены
-    """
+    """Загружает конфигурацию из .env файла."""
     return AppConfig()

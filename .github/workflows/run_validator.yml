@@ -2,7 +2,7 @@ name: Run Validator
 
 on:
   schedule:
-    - cron: '0 * * * *' # Запуск каждый час
+    - cron: '0 */3 * * *' # Запуск каждые 3 часа
   workflow_dispatch: # Возможность ручного запуска
     inputs:
       param:

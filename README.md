@@ -36,16 +36,21 @@ pip3 install -r requirements.txt
 
 ## Использование
 
-### Ручной запуск
+### Быстрый запуск
 
-1. Убедитесь, что виртуальное окружение активировано:
-   ```bash
-   source .venv/bin/activate
-   ```
-2. Запустите скрипт:
-   ```bash
-   python -m src.runner
-   ```
+```bash
+# Активировать виртуальное окружение
+source .venv/bin/activate
+
+# Запустить валидацию
+python run.py
+```
+
+### Альтернативный запуск
+
+```bash
+python -m src.runner
+```
 
 ### Автоматический запуск (GitHub Actions)
 
@@ -126,20 +131,30 @@ pip3 install -r requirements.txt
 ## Структура проекта
 
 ```
-sales_quality_checker/
+admin_validator/
 ├── .env                   # Переменные окружения
 ├── .gitignore             # Git исключения
+├── run.py                 # Быстрый запуск
 ├── requirements.txt       # Python зависимости
+├── pyproject.toml         # Конфигурация проекта
 ├── README.md              # Эта документация
-├── SETUP_GUIDE.md         # Детальная инструкция по настройке
 ├── secrets/
 │   └── service_account.json  # Google credentials (не комитить!)
-└── src/
-    ├── config.py          # Конфигурация (Pydantic)
-    ├── runner.py          # Главный скрипт
-    ├── sheets_client.py   # Google Sheets API клиент
-    ├── validator.py       # Логика валидации
-    └── report_manager.py  # Управление отчетом и reconciliation
+├── src/
+│   ├── config.py          # Конфигурация (Pydantic)
+│   ├── runner.py          # Главный скрипт
+│   ├── sheets_client.py   # Google Sheets API клиент
+│   ├── models.py          # Pydantic модели
+│   ├── utils.py           # Утилиты (парсинг, форматирование)
+│   ├── report_manager.py  # Управление отчетом
+│   └── validators/        # Валидаторы
+│       ├── base.py        # Базовый класс
+│       ├── sales.py       # Продажи
+│       ├── trainings.py   # Тренировки
+│       └── leads.py       # Обращения
+└── tests/
+    ├── test_utils.py      # Тесты утилит
+    └── test_models.py     # Тесты моделей
 ```
 
 ## Отчет "Задачи"
@@ -156,6 +171,5 @@ sales_quality_checker/
 ## Будущие улучшения
 
 - [ ] Telegram уведомления о новых ошибках
-- [ ] Расписание автозапусков (cron/GitHub Actions)
 - [ ] Dashboard с метриками качества данных
 - [ ] История изменений ошибок
